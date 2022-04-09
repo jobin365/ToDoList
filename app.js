@@ -3,7 +3,7 @@
 const express = require("express");
 const app = express();
 const mongoose = require('mongoose');
-const _=require('lodash');
+const _ = require('lodash');
 
 app.use(express.json())
 app.use(express.urlencoded({
@@ -90,7 +90,7 @@ app.get("/:listName", function (req, res) {
 app.post("/", function (req, res) {
   const item = req.body.task;
   const list = req.body.push;
-  if (list === "Today") { 
+  if (list === "Today") {
     const newItem = new Item({
       name: item
     })
@@ -102,7 +102,9 @@ app.post("/", function (req, res) {
       name: list
     }, function (err, doc) {
       if (!err) {
-        doc.items.push({name:item});
+        doc.items.push({
+          name: item
+        });
         doc.save();
         res.redirect("/" + list);
       } else
@@ -114,20 +116,27 @@ app.post("/", function (req, res) {
 
 app.post("/delete", function (req, res) {
   const toBeDeleted = req.body.deleted;
-  const listName=req.body.listName;
-  if(listName==="Today"){
+  const listName = req.body.listName;
+  if (listName === "Today") {
     Item.findByIdAndRemove(toBeDeleted, function (err) {
       if (err) console.log(err)
       else console.log('Success')
     })
     res.redirect("/")
-  }
-  else{
-    List.findOneAndUpdate({name:listName},{$pull:{items:{_id:toBeDeleted}}},function(err,docs){
-      if(err)
+  } else {
+    List.findOneAndUpdate({
+      name: listName
+    }, {
+      $pull: {
+        items: {
+          _id: toBeDeleted
+        }
+      }
+    }, function (err, docs) {
+      if (err)
         console.log(err);
     });
-    res.redirect("/"+listName);
+    res.redirect("/" + listName);
   }
 })
 
